@@ -16,6 +16,11 @@ A weather dashboard app you can use to plan your next holiday! Have you ever bee
   - Below all the data about the current day's weather, there is a 5-day forecast for the weather
 
 ## Screenshots
+![Screen Shot 2021-01-21 at 3 30 22 pm](https://user-images.githubusercontent.com/20080981/105282157-a3545a80-5bfd-11eb-9c64-55744aba3576.png)
+![Screen Shot 2021-01-21 at 3 30 29 pm](https://user-images.githubusercontent.com/20080981/105282165-a64f4b00-5bfd-11eb-92c9-b88ea0a707f8.png)
+
+## Deployed App
+https://connor-walden.github.io/weather-dashboard
 
 ## Built with
 - HTML 
