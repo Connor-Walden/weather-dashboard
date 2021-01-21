@@ -23,64 +23,66 @@ $(document).ready(function() {
   if(savedCities == null) savedCities = []; else handleData(savedCities[0]);
 
   // Load local storage 
-  savedCities.forEach(function(city) {
-    listCities.append('<ul class="list-group-item" data-city-name="' + city + '">' + city + '</ul>');
-  });
+  updateCityList();
 
   // Using moment to get current date
   var today = moment();
 
   // When the user clicks the search button
   submitSearch.on("click", function() {
-    // If the user has typed before hitting the search button
     if(searchBox.val().length > 0) {
-
-      // save the search by appending to the page and saving to localstorage
-      if(!isWithin(searchBox.val(), savedCities)) {
-        savedCities.push(searchBox.val());
-        localStorage.setItem("cities-saved", JSON.stringify(savedCities));
-        listCities.append('<ul class="list-group-item" data-city-name="' + searchBox.val() + '">' + searchBox.val() + '</ul>');
-      }
-
-      // Because at this point the city is verified, display data
       handleData(searchBox.val()); 
-      searchBox.val("");
     }
   });
 
   // When the user hits enter
   searchForm.on("submit", function(event) {
     if(searchBox.val().length > 0) {
-    // save the search by appending to the page and saving to localstorage
-      if(!isWithin(searchBox.val(), savedCities)) {
-        savedCities.push(searchBox.val());
-        localStorage.setItem("cities-saved", JSON.stringify(savedCities));
-        listCities.append('<ul class="list-group-item" data-city-name="' + searchBox.val() + '">' + searchBox.val() + '</ul>');
-      }
-
-      // Because at this point the city is verified, display data
       handleData(searchBox.val()); 
-      searchBox.val("");
-
       event.preventDefault();
     }
   });
+
+  function updateCityList() {
+    listCities.html("");
+
+    for(var i = 0; i < savedCities.length; i++) {
+      listCities.append('<ul class="list-group-item" data-city-name="' + savedCities[i] + '">' + savedCities[i] + '</ul>');
+    }
+  }
 
   // Check to see if user wants to switch to a previously searched city
   listCities.on("click", function(event) {
     var city = event.target.getAttribute("data-city-name");
     if(city != null && city != undefined) {
-      handleData(city);
+      handleData(city, true);
     }
   });
 
-  function handleData(currentCity) {
+  function handleData(currentCity, clicked) {
     // Query the api to check if the city is in there
     $.ajax({
       url: constructQueryNow(currentCity),
       method: "get",
       success: function(data) {
-        // If the city searched returns data
+        
+        if(!clicked) {
+          // save the search by appending to the page and saving to localstorage
+          if(!savedCities.includes(currentCity)) {
+            savedCities.unshift(currentCity);
+            localStorage.setItem("cities-saved", JSON.stringify(savedCities));
+            updateCityList();
+          } else {
+            // Swap positions of the first city and the city searched
+            var tmp = savedCities[0];
+            var index = savedCities.indexOf(currentCity);
+
+            // The actual swap
+            savedCities[0] = savedCities[index];
+            savedCities[index] = tmp;
+            updateCityList();
+          }
+        }
 
         // City name
         cityName.text(currentCity + " (" + today.date() + "/" + (today.month() + 1) + "/" + today.year() + ")");
