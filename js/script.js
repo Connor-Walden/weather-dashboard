@@ -52,7 +52,6 @@ $(document).ready(function() {
 
   // When the user hits enter
   searchForm.on("submit", function(event) {
-    event.preventDefault();
     if(searchBox.val().length > 0) {
     // save the search by appending to the page and saving to localstorage
       if(!isWithin(searchBox.val(), savedCities)) {
@@ -64,6 +63,8 @@ $(document).ready(function() {
       // Because at this point the city is verified, display data
       handleData(searchBox.val()); 
       searchBox.val("");
+
+      event.preventDefault();
     }
   });
 
