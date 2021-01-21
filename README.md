@@ -24,4 +24,4 @@ A weather dashboard app you can use to plan your next holiday! Have you ever bee
 - jQuery
 
 ## Thanks To
-A big thanks to OpenWeatherMap for the brilliant API that made this possible
+A big thanks to OpenWeatherMap and momentjs for making this possible!
