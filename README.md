@@ -20,7 +20,7 @@ A weather dashboard app you can use to plan your next holiday! Have you ever bee
 ![Screen Shot 2021-01-21 at 3 30 29 pm](https://user-images.githubusercontent.com/20080981/105282165-a64f4b00-5bfd-11eb-92c9-b88ea0a707f8.png)
 
 ## Deployed App
-https://connor-walden.github.io/weather-dashboard
+http://connor-walden.github.io/weather-dashboard
 
 ## Built with
 - HTML 
