@@ -4,6 +4,7 @@ $(document).ready(function() {
 
   // These variables are for the elements in the left-side column
   var searchBox = $("#search");
+  var searchForm = $("#search-form");
   var submitSearch = $("#submit");
   var listCities = $("#list-cities");
     
@@ -18,7 +19,11 @@ $(document).ready(function() {
   // Saved Cities
   var savedCities = JSON.parse(localStorage.getItem("cities-saved"));
   console.log(savedCities);
-  if(savedCities == null) savedCities = [];
+  
+  // if there is data to show, show it... else create a new empty array
+  if(savedCities == null) savedCities = []; else handleData(savedCities[0]);
+
+  // Load local storage 
   savedCities.forEach(function(city) {
     console.log(city);
     listCities.append('<ul class="list-group-item" data-city-name="' + city + '">' + city + '</ul>');
@@ -27,24 +32,43 @@ $(document).ready(function() {
   // Using moment to get current date
   var today = moment();
 
-  if($(".selectButton"))
-
   // When the user clicks the search button
   submitSearch.on("click", function() {
     // If the user has typed before hitting the search button
     if(searchBox.val().length > 0) {
 
       // save the search by appending to the page and saving to localstorage
-      savedCities.push(searchBox.val());
-      localStorage.setItem("cities-saved", JSON.stringify(savedCities));
-      listCities.append('<ul class="list-group-item" data-city-name="' + searchBox.val() + '">' + searchBox.val() + '</ul>');
+      if(!isWithin(searchBox.val(), savedCities)) {
+        savedCities.push(searchBox.val());
+        localStorage.setItem("cities-saved", JSON.stringify(savedCities));
+        listCities.append('<ul class="list-group-item" data-city-name="' + searchBox.val() + '">' + searchBox.val() + '</ul>');
+      }
 
+      // Because at this point the city is verified, display data
       handleData(searchBox.val()); 
+      searchBox.val("");
     }
   });
 
+  // When the user hits enter
+  searchForm.on("submit", function(event) {
+    event.preventDefault();
+    if(searchBox.val().length > 0) {
+    // save the search by appending to the page and saving to localstorage
+      if(!isWithin(searchBox.val(), savedCities)) {
+        savedCities.push(searchBox.val());
+        localStorage.setItem("cities-saved", JSON.stringify(savedCities));
+        listCities.append('<ul class="list-group-item" data-city-name="' + searchBox.val() + '">' + searchBox.val() + '</ul>');
+      }
+
+      // Because at this point the city is verified, display data
+      handleData(searchBox.val()); 
+      searchBox.val("");
+    }
+  });
+
+  // Check to see if user wants to switch to a previously searched city
   listCities.on("click", function(event) {
-    console.log("clicked");
     var city = event.target.getAttribute("data-city-name");
     if(city != null && city != undefined) {
       handleData(city);
@@ -76,6 +100,7 @@ $(document).ready(function() {
           url: constructQueryUV(data.coord.lat, data.coord.lon),
           method: "get",
           success: function (data) {
+            // Coloring uv depending on the classes low = 0-2, medium = 3-4, moderate = 5-6, severe = 7+
             if(data.value >= 0 && data.value <=2) {
               cityUV.html('UV Index: <span class="badge bg-success">' + data.value + '</span>');
             }
@@ -123,5 +148,15 @@ $(document).ready(function() {
   // This function return the url of the query to be made for the uv-index right now
   function constructQueryUV(lat, lon) {
     return "http://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + lon + "&appid=" + apiKey;
+  }
+
+  // helper function
+  function isWithin(a, b) {
+    for(var i = 0; i < b.length; i++) {
+      if(a == b[i])
+        return true;
+    }
+
+    return false;
   }
 });

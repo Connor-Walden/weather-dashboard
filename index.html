@@ -31,12 +31,16 @@
               <label for="search" class="form-label">Search for a city: </label>
             </div>
 
-            <div class="col-sm-9">
-              <input type="text" name="search" id="search" class="form-control" placeholder="Your city here..." />
-            </div>
-            <div class="col-sm-3">
-              <img type="submit" id="submit" src="./25560-middle.png" alt="Search Icon" width="50" height="40"></div>
-            </div>
+            <form id="search-form" action="index.html" method="post">
+              <div class="row">
+                <div class="col-sm-9">
+                  <input type="text" name="search" id="search" class="form-control" placeholder="Your city here..." />
+                </div>
+                <div class="col-sm-3">
+                  <img type="submit" id="submit" src="./25560-middle.png" alt="Search Icon" width="50" height="40"></div>
+                </div>
+              </div>
+          </form>
 
             <!-- LIST CITIES -->
             <ul class="list-group mt-3" id="list-cities">
