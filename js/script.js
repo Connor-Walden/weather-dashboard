@@ -18,14 +18,12 @@ $(document).ready(function() {
 
   // Saved Cities
   var savedCities = JSON.parse(localStorage.getItem("cities-saved"));
-  console.log(savedCities);
   
   // if there is data to show, show it... else create a new empty array
   if(savedCities == null) savedCities = []; else handleData(savedCities[0]);
 
   // Load local storage 
   savedCities.forEach(function(city) {
-    console.log(city);
     listCities.append('<ul class="list-group-item" data-city-name="' + city + '">' + city + '</ul>');
   });
 
@@ -137,18 +135,18 @@ $(document).ready(function() {
 
   // This function return the url of the query to be made for the weather right now
   function constructQueryNow(cityName) {
-    return "http://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&appid=" + apiKey;
+    return "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&appid=" + apiKey;
   }
   
   // This function return the url of the query to be made for the weather for the next
   // five days
   function constructQuery5Day(cityName) {
-    return "http://api.openweathermap.org/data/2.5/forecast?q=" + cityName + "&appid=" + apiKey;
+    return "https://api.openweathermap.org/data/2.5/forecast?q=" + cityName + "&appid=" + apiKey;
   }
   
   // This function return the url of the query to be made for the uv-index right now
   function constructQueryUV(lat, lon) {
-    return "http://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + lon + "&appid=" + apiKey;
+    return "https://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + lon + "&appid=" + apiKey;
   }
 
   // helper function
