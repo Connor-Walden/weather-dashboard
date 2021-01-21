@@ -15,32 +15,113 @@ $(document).ready(function() {
   var cityUV = $("#city-uv");
   var fiveDayForecast = $("#5day-forecast");
 
-  
+  // Saved Cities
+  var savedCities = JSON.parse(localStorage.getItem("cities-saved"));
+  console.log(savedCities);
+  if(savedCities == null) savedCities = [];
+  savedCities.forEach(function(city) {
+    console.log(city);
+    listCities.append('<ul class="list-group-item" data-city-name="' + city + '">' + city + '</ul>');
+  });
+
+  // Using moment to get current date
+  var today = moment();
+
+  if($(".selectButton"))
+
+  // When the user clicks the search button
+  submitSearch.on("click", function() {
+    // If the user has typed before hitting the search button
+    if(searchBox.val().length > 0) {
+
+      // save the search by appending to the page and saving to localstorage
+      savedCities.push(searchBox.val());
+      localStorage.setItem("cities-saved", JSON.stringify(savedCities));
+      listCities.append('<ul class="list-group-item" data-city-name="' + searchBox.val() + '">' + searchBox.val() + '</ul>');
+
+      handleData(searchBox.val()); 
+    }
+  });
+
+  listCities.on("click", function(event) {
+    console.log("clicked");
+    var city = event.target.getAttribute("data-city-name");
+    if(city != null && city != undefined) {
+      handleData(city);
+    }
+  });
+
+  function handleData(currentCity) {
+    // Query the api to check if the city is in there
+    $.ajax({
+      url: constructQueryNow(currentCity),
+      method: "get",
+      success: function(data) {
+        // If the city searched returns data
+
+        // City name
+        cityName.text(currentCity + " (" + today.date() + "/" + (today.month() + 1) + "/" + today.year() + ")");
+      
+        // current temperature, returned as kelvin so -273.15 to convert to celsius
+        cityTemp.text("Temperature: " + Math.round((data.main.temp - 273.15))+" C");
+
+        // Current humidity
+        cityHumidity.text("Humidity: "+ data.main.humidity + "%");
+
+        // Current wind speed
+        cityWind.text("Wind Speed: " + data.wind.speed + " m/s");
+
+        // Current UV index (New api call to uv api)
+        $.ajax({
+          url: constructQueryUV(data.coord.lat, data.coord.lon),
+          method: "get",
+          success: function (data) {
+            if(data.value >= 0 && data.value <=2) {
+              cityUV.html('UV Index: <span class="badge bg-success">' + data.value + '</span>');
+            }
+            else if(data.value >= 3 && data.value <=4) {
+              cityUV.html('UV Index: <span class="badge bg-secondary">' + data.value + '</span>');
+            }
+            else if(data.value >= 5 && data.value <=6) {
+              cityUV.html('UV Index: <span class="badge bg-warning">' + data.value + '</span>');
+            }
+            else if(data.value >= 7) {
+              cityUV.html('UV Index: <span class="badge bg-danger">' + data.value + '</span>');
+            }
+          }
+        });
+
+        // Current 5-day forecast (New api call to 5day api)
+        $.ajax({
+          url: constructQuery5Day(currentCity),
+          method: "get",
+          success: function (data) {
+            fiveDayForecast.html("");
+
+            for(var i = 0; i < data.cnt; i += 8)
+            {
+              // Update 5 day forecast
+              fiveDayForecast.append('<div class="col-sm-2"><div class="card bg-primary"><h5 class="card-title">' + data.list[i].dt_txt.substring(0, 10) + '</h5><img src="http://openweathermap.org/img/wn/' + data.list[i].weather[0].icon + '@2x.png" class="card-img-top" alt="weather image"><p class="card-text">Temp: ' + Math.round(data.list[i].main.temp -273.15) + ' C</p><p class="card-text"> Humidity: ' + data.list[i].main.humidity + '%</p></div></div>');
+            }
+          }
+        });
+      }
+    });
+  }
 
   // This function return the url of the query to be made for the weather right now
   function constructQueryNow(cityName) {
-    return "api.openweathermap.org/data/2.5/weather?q=" + cityName + "&appid=" + apiKey;
+    return "http://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&appid=" + apiKey;
   }
   
   // This function return the url of the query to be made for the weather for the next
   // five days
   function constructQuery5Day(cityName) {
-    return "api.openweathermap.org/data/2.5/forecast?q=" + cityName + "&appid=" + apiKey;
+    return "http://api.openweathermap.org/data/2.5/forecast?q=" + cityName + "&appid=" + apiKey;
   }
   
   // This function return the url of the query to be made for the uv-index right now
-  function constructQueryUV(cityName) {
-    var lat, lon; 
-    
-    $.ajax({
-      url: constructQueryNow(cityName),
-      method: "get",
-      success: function(data) {
-        lat = data.coord.lat;
-        lon = data.coord.lon;
-      }
-    });
-  
+  function constructQueryUV(lat, lon) {
     return "http://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + lon + "&appid=" + apiKey;
   }
 });
